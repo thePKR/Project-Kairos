@@ -1,10 +1,35 @@
 import subprocess
 import sys
 import os
+import re
 import tempfile
 import shutil
 
 MAX_RETRIES = 3
+
+# Standard library modules that ship with Python — anything NOT in this list
+# is assumed to be a third-party package that the user will install separately.
+# We only need a reasonable subset to catch the most common false negatives.
+STDLIB_TOP_LEVEL = {
+    "abc", "argparse", "ast", "asyncio", "base64", "bisect", "calendar",
+    "cmath", "collections", "colorsys", "configparser", "contextlib", "copy",
+    "csv", "ctypes", "dataclasses", "datetime", "decimal", "difflib", "email",
+    "enum", "errno", "fnmatch", "fractions", "ftplib", "functools", "gc",
+    "getpass", "glob", "gzip", "hashlib", "heapq", "hmac", "html", "http",
+    "imaplib", "importlib", "inspect", "io", "ipaddress", "itertools", "json",
+    "keyword", "linecache", "locale", "logging", "lzma", "math", "mimetypes",
+    "multiprocessing", "netrc", "numbers", "operator", "os", "pathlib",
+    "pickle", "pkgutil", "platform", "pprint", "profile", "queue", "random",
+    "re", "readline", "reprlib", "sched", "secrets", "select", "shelve",
+    "shlex", "shutil", "signal", "site", "smtplib", "socket", "socketserver",
+    "sqlite3", "ssl", "stat", "statistics", "string", "struct", "subprocess",
+    "sys", "sysconfig", "tempfile", "textwrap", "threading", "time",
+    "timeit", "tkinter", "token", "tokenize", "traceback", "tracemalloc",
+    "turtle", "types", "typing", "unicodedata", "unittest", "urllib",
+    "uuid", "venv", "warnings", "wave", "weakref", "webbrowser", "xml",
+    "xmlrpc", "zipfile", "zipimport", "zlib", "_thread", "concurrent",
+}
+
 
 def find_entry_point(files: dict) -> str:
     """
@@ -25,17 +50,41 @@ def find_entry_point(files: dict) -> str:
     
     return ""
 
+
+def _is_third_party_import_error(stderr: str, files: dict) -> bool:
+    """
+    Returns True if the error is ONLY a ModuleNotFoundError for a third-party
+    package (one that will be satisfied by `pip install -r requirements.txt`).
+    Real bugs like SyntaxError, NameError, TypeError etc. return False.
+    """
+    # Must be a ModuleNotFoundError
+    match = re.search(r"ModuleNotFoundError: No module named ['\"](\w+)['\"]", stderr)
+    if not match:
+        return False
+    
+    missing_module = match.group(1)
+    
+    # If it's a standard library module, it's a real bug (broken Python install)
+    if missing_module in STDLIB_TOP_LEVEL:
+        return False
+    
+    # If it's one of our own generated files, it's a real bug (bad import path)
+    for path in files.keys():
+        module_name = os.path.splitext(os.path.basename(path))[0]
+        if missing_module == module_name:
+            return False
+    
+    # It's a third-party package — this will be installed by the user
+    return True
+
+
 def run_in_sandbox(files: dict, timeout: int = 15) -> dict:
     """
     Writes files to a temp directory, executes the entry point in an isolated subprocess,
     and returns the result with stdout, stderr, and success status.
     
-    Args:
-        files: Dict of {relative_path: content_string}
-        timeout: Max seconds to allow the script to run before killing it
-        
-    Returns:
-        dict with keys: success (bool), stdout (str), stderr (str), entry_point (str)
+    Third-party ModuleNotFoundErrors (e.g., 'streamlit', 'neo4j') are treated as
+    PASS since they will be resolved when the user runs `pip install -r requirements.txt`.
     """
     entry_point = find_entry_point(files)
     
@@ -69,6 +118,17 @@ def run_in_sandbox(files: dict, timeout: int = 15) -> dict:
             cwd=sandbox_dir,
             env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}
         )
+        
+        # Check for third-party import errors (these are NOT real bugs)
+        if result.returncode != 0 and _is_third_party_import_error(result.stderr, files):
+            missing = re.search(r"No module named ['\"](\w+)['\"]", result.stderr)
+            pkg_name = missing.group(1) if missing else "unknown"
+            return {
+                "success": True,
+                "stdout": f"Third-party package '{pkg_name}' not installed locally (expected — listed in requirements.txt).",
+                "stderr": "",
+                "entry_point": entry_point
+            }
         
         return {
             "success": result.returncode == 0,

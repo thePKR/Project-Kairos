@@ -381,7 +381,38 @@ if __name__ == "__main__":
     # Get the objective BEFORE building the graph so the user isn't waiting
     # while 200MB of LangGraph native libs load in the background.
     print("Project Kairos : Software Factory Initialized.")
-    objective = input("\nAwaiting Objective: ")
+    print("  Tip: Paste multi-line objectives freely. Press ENTER on an empty line to submit.")
+    print("  Tip: Or type a .spec file path to load from file.\n")
+    
+    lines = []
+    while True:
+        try:
+            line = input(">> " if not lines else ".. ")
+        except EOFError:
+            break
+        if line.strip() == "" and lines:
+            break  # Empty line after content = submit
+        if line.strip() == "" and not lines:
+            continue  # Ignore leading blank lines
+        lines.append(line)
+    
+    raw_input = "\n".join(lines).strip()
+    
+    # Spec-file support: if the input ends with .spec, read the file contents
+    if raw_input.endswith(".spec") and os.path.isfile(raw_input):
+        with open(raw_input, "r", encoding="utf-8") as spec_file:
+            objective = spec_file.read().strip()
+        print(f"[Spec Loader] Loaded objective from: {raw_input}")
+        print(f"[Spec Loader] Objective length: {len(objective)} characters")
+    else:
+        objective = raw_input
+    
+    if not objective:
+        print("[Error] No objective provided. Exiting.")
+        exit(1)
+        
+    print(f"\n[Objective] {objective[:120]}{'...' if len(objective) > 120 else ''}")
+    print(f"[Objective] Length: {len(objective)} characters")
 
     # Now do the heavy lifting — user has already given us the goal
     from langchain_core.messages import HumanMessage
