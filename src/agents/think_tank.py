@@ -10,8 +10,8 @@ def reasoning_node(state: KairosState) -> Dict[str, Any]:
     
     llm = get_llm(role="core_reasoner")
     prompt = f"""Analyze this software/system objective: '{objective}'. 
-    List precisely 3 critical technical constraints or edge cases necessary for success. 
-    Output ONLY a valid parseable python list of strings, e.g.: ['constraint 1', 'constraint 2', 'constraint 3']. Do not wrap in markdown blocks."""
+    Exhaustively list ALL critical technical constraints, risks, or edge cases necessary for success. Do not limit yourself; list as many as you encounter.
+    Output ONLY a valid parseable python list of strings, e.g.: ['constraint 1', 'constraint 2', ...]. Do not wrap in markdown blocks."""
     
     try:
         response = llm.invoke(prompt)
@@ -30,8 +30,8 @@ def decomposition_node(state: KairosState) -> Dict[str, Any]:
     constraints = state.get("system_constraints", [])
     
     llm = get_llm(role="systems_engineer")
-    prompt = f"""Break down this objective into exactly 3 modular software tasks: '{objective}'. 
-    Keep these constraints in mind: {constraints}.
+    prompt = f"""Break down this objective into a comprehensive array of modular software tasks: '{objective}'. 
+    Keep these constraints in mind: {constraints}. Break it down into as many distinct tasks as necessary to perfectly fulfill the objective.
     Output ONLY a raw valid JSON object where keys correspond to module names and values are short descriptions. Do not wrap in markdown blocks. Example: {{"Data_Ingestion": "Fetch prices"}}"""
     
     try:
