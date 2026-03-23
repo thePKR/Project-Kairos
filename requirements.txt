@@ -1,0 +1,13 @@
+langchain
+langchain-core
+langchain-community
+langgraph
+langchain-nvidia-ai-endpoints
+langchain-openai
+langchain-anthropic
+langchain-groq
+neo4j
+chromadb
+python-dotenv
+duckduckgo-search
+docker
