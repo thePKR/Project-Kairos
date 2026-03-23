@@ -10,6 +10,7 @@ class KairosState(TypedDict):
     
     # 1. Activation Phase
     user_objective: str
+    historical_context: str
     
     # 2. Think-Tank Phase
     system_constraints: List[str]
@@ -23,6 +24,10 @@ class KairosState(TypedDict):
     # 4. Parallel Execution Phase
     shared_memory_buffer: Dict[str, str] # High-speed Librarian view
     final_compiled_files: Dict[str, str] # Relative Path -> String Content
+    
+    # 4.5 Sandbox Self-Correction
+    sandbox_error_log: str
+    sandbox_retries: int
     
     # 5. Validation & Delivery (Phase 5 GitHub)
     validation_status: str

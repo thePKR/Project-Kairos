@@ -53,6 +53,16 @@ def delivery_node(state: KairosState):
                 f.write(content)
             print(f" -> Generated: {rel_path}")
             
+        # Archive the final objective to Neo4j Long-Term Memory
+        dep_graph = state.get("dependency_graph", {})
+        if dep_graph and final_files:
+            try:
+                from src.memory.graph_manager import KairosGraphManager
+                manager = KairosGraphManager()
+                manager.archive_project(objective, dep_graph, final_files)
+            except Exception as e:
+                print(f"  [Memory Error] Could not archive to graph: {e}")
+            
     # 2. Deliver & Commit Synthesized Python Tools (Phase 5 Autonomous Git Push)
     generated_tools = state.get("generated_tools", {})
     if generated_tools and state.get("pr_approved"):
@@ -201,6 +211,20 @@ def synthesis_node(state: KairosState):
         f"'{objective}'\n\n"
         f"They produced the following fragmented architectural components:\n"
         f"=====\n{full_context}\n=====\n\n"
+    )
+    
+    # Self-correction: if the sandbox found errors, inject them
+    sandbox_error = state.get("sandbox_error_log", "")
+    if sandbox_error:
+        retries = state.get("sandbox_retries", 0)
+        prompt += (
+            f"\n⚠️ CRITICAL: Your previous code generation FAILED execution testing.\n"
+            f"This is retry attempt #{retries}. The subprocess returned this error:\n"
+            f"```\n{sandbox_error[:1500]}\n```\n"
+            f"You MUST fix the bug. Re-generate ALL files with the fix applied.\n\n"
+        )
+    
+    prompt += (
         "Your task: Consolidate everything into a fully scalable, multi-file software repository. Generate the frontend, backend, database connectors, and documentation in their appropriate folders.\n"
         "Output EACH file strictly using the following delimiter format:\n\n"
         "__FILE_START__::relative/path/to/filename.ext\n"
@@ -244,6 +268,47 @@ def validation_gate_node(state: KairosState):
     print("[Validation Gate] Running Cross-Peer Code Review...")
     return {"validation_status": "PASS"}
 
+def sandbox_node(state: KairosState):
+    """Executes generated code in an isolated subprocess and captures errors."""
+    from src.sandbox.executor import run_in_sandbox, MAX_RETRIES
+    
+    final_files = state.get("final_compiled_files", {})
+    retries = state.get("sandbox_retries", 0)
+    
+    # Skip sandbox if no Python files exist (e.g., pure documentation)
+    has_python = any(p.endswith(".py") for p in final_files.keys())
+    if not has_python:
+        print("[Sandbox] No Python files detected. Skipping execution test.")
+        return {"sandbox_error_log": "", "sandbox_retries": retries}
+    
+    print(f"\n[Sandbox] Attempt {retries + 1}/{MAX_RETRIES} — Executing generated code...")
+    result = run_in_sandbox(final_files)
+    
+    if result["success"]:
+        print(f" -> ✅ Code executed successfully. Entry: {result['entry_point']}")
+        if result["stdout"]:
+            print(f"    stdout: {result['stdout'][:300]}")
+        return {"sandbox_error_log": "", "sandbox_retries": retries}
+    else:
+        error_msg = result["stderr"]
+        print(f" -> ❌ Execution FAILED (attempt {retries + 1}/{MAX_RETRIES})")
+        print(f"    stderr: {error_msg[:500]}")
+        return {"sandbox_error_log": error_msg, "sandbox_retries": retries + 1}
+
+def memory_retrieval_node(state: KairosState):
+    print("\n[Memory] Connecting to Neo4j to retrieve past architectures...")
+    from src.memory.graph_manager import KairosGraphManager
+    manager = KairosGraphManager()
+    objective = state.get("user_objective", "")
+    historical = manager.retrieve_context(objective)
+    
+    if historical:
+        print(" -> Found relevant past objectives. Ingesting context.")
+    else:
+        print(" -> No relevant historical context found. Starting fresh.")
+        
+    return {"historical_context": historical}
+
 # ==========================================
 # Build Graph Structure
 # ==========================================
@@ -259,18 +324,21 @@ def build_factory_graph():
     workflow = StateGraph(KairosState)
     
     # Add Nodes
+    workflow.add_node("memory_retrieval", memory_retrieval_node)
     workflow.add_node("reasoning", reasoning_node)
     workflow.add_node("decomposition", decomposition_node)
     workflow.add_node("assignment", assignment_node)
     workflow.add_node("huddle", huddle_node)
     workflow.add_node("parallel_execution", parallel_execution_node)
     workflow.add_node("synthesis", synthesis_node)
+    workflow.add_node("sandbox", sandbox_node)
     workflow.add_node("validation", validation_gate_node)
     workflow.add_node("github_pr", github_pr_node)
     workflow.add_node("delivery", delivery_node)
     
     # Path logic
-    workflow.set_entry_point("reasoning")
+    workflow.set_entry_point("memory_retrieval")
+    workflow.add_edge("memory_retrieval", "reasoning")
     workflow.add_edge("reasoning", "decomposition")
     workflow.add_edge("decomposition", "assignment")
     workflow.add_edge("assignment", "huddle")
@@ -283,7 +351,18 @@ def build_factory_graph():
     workflow.add_conditional_edges("huddle", huddle_router)
     
     workflow.add_edge("parallel_execution", "synthesis")
-    workflow.add_edge("synthesis", "validation")
+    workflow.add_edge("synthesis", "sandbox")
+    
+    def sandbox_router(state: KairosState):
+        from src.sandbox.executor import MAX_RETRIES
+        error_log = state.get("sandbox_error_log", "")
+        retries = state.get("sandbox_retries", 0)
+        if error_log and retries < MAX_RETRIES:
+            print(f"[Sandbox Router] Re-routing to synthesis for self-correction (retry {retries}/{MAX_RETRIES})...")
+            return "synthesis"
+        return "validation"
+    
+    workflow.add_conditional_edges("sandbox", sandbox_router)
     workflow.add_edge("validation", "github_pr")
     
     def pr_router(state: KairosState):

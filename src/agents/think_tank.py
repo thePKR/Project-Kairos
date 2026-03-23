@@ -7,11 +7,15 @@ def reasoning_node(state: KairosState) -> Dict[str, Any]:
     """Reasoning Agent: Analyzes the initial objective to formulate edge cases and constraints."""
     print("[Think-Tank] Reasoner: Routing to core_reasoner (GPT-OSS logic)...")
     objective = state.get("user_objective", "")
+    historical_context = state.get("historical_context", "")
     
     llm = get_llm(role="core_reasoner")
-    prompt = f"""Analyze this software/system objective: '{objective}'. 
-    Exhaustively list ALL critical technical constraints, risks, or edge cases necessary for success. Do not limit yourself; list as many as you encounter.
-    Output ONLY a valid parseable python list of strings, e.g.: ['constraint 1', 'constraint 2', ...]. Do not wrap in markdown blocks."""
+    prompt = f"Analyze this software/system objective: '{objective}'.\n"
+    
+    if historical_context:
+        prompt += f"\nYou have Long-Term Graph Memory of past objectives. Consider them strictly as context to avoid duplicating logic or repeating architectural mistakes:\n{historical_context}\n"
+        
+    prompt += "\nExhaustively list ALL critical technical constraints, risks, or edge cases necessary for success. Do not limit yourself; list as many as you encounter.\n    Output ONLY a valid parseable python list of strings, e.g.: ['constraint 1', 'constraint 2', ...]. Do not wrap in markdown blocks."
     
     try:
         response = llm.invoke(prompt)
