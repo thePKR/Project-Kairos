@@ -198,11 +198,14 @@ if __name__ == "__main__":
         
         proceed = input("\n[Director Input] Type 'Proceed' to authorize Swarm Huddle (or 'Modify' to reject): ")
         
-        if proceed.lower() == "proceed":
+        if proceed.strip().lower() == "proceed":
             print("\n--- PHASE 3: PARALLEL SWARM DEPLOYMENT ---")
             app.update_state(config, {"human_approved": True})
             for output in app.stream(None, config): 
                 pass
+        else:
+            print("\n[Swarm Halted] Execution rejected by Director.")
+            sys.exit(0)
                 
     # Check if halted at the second gate: System Upgrade PR
     state_snap_pr = app.get_state(config)
@@ -212,11 +215,13 @@ if __name__ == "__main__":
         # We only ask for PR review if the swarm generated actual Python code
         if state_snap_pr.values.get("generated_tools"):
             approve_pr = input("\n[Director Input] Type 'Merge' to authorize Autonomous Github Commit: ")
-            if approve_pr.lower() == "merge":
+            if approve_pr.strip().lower() == "merge":
                 print("\n--- PHASE 5: AUTONOMOUS METAPROGRAMMING DEPLOYMENT ---")
                 app.update_state(config, {"pr_approved": True})
                 for output in app.stream(None, config):
                     pass
+            else:
+                print("\n[Swarm Halted] Autonomous Code Commit rejected by Director.")
         else:
              # Fast-forward past the PR node implicitly if no python code exists
              app.update_state(config, {"pr_approved": True})
