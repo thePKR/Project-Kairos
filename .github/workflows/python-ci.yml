@@ -1,0 +1,31 @@
+name: Project Kairos CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        
+    - name: Lint generated Swarm code with flake8
+      run: |
+        # Stop the build if the AI generated Python syntax errors
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Treat style issues as warnings
+        flake8 . --count --exit-zero --max-complexity=15 --max-line-length=127 --statistics

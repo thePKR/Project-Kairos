@@ -2,7 +2,26 @@
 
 Project Kairos is an advanced, multi-agent orchestration framework utilizing **LangGraph**, **NVIDIA NIM**, **DeepSeek**, and **Neo4j**. It is designed as an Objective-Driven Software Factory capable of generating extremely dense AI analysis, dynamically analyzing internal capability gaps, writing its own Python tools, and pushing them autonomously to its own Git repository.
 
-## The Architecture
+## ⚡ Zero-Config Quick Start
+Deploy the autonomous swarm on your local machine in under 60 seconds.
+
+```bash
+git clone https://github.com/thePKR/Project-Kairos.git
+cd Project-Kairos
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+```
+1. Copy `.env.example` to `.env` and insert your free NVIDIA NIM API key.
+2. Wake up the Factory:
+```bash
+python src/main.py
+```
+> **Hello World Objective:** `"Analyze optimal capital allocation strategies for commercial banks under strict ESG constraints."`
+
+---
+
+## 🏗 The Architecture
 The Swarm is completely decoupled from heavy VRAM hardware constraints by splitting the cognitive architecture into Cloud/Local layers:
 - **The Engine (Local Chaos):** A lightweight Python/LangGraph control loop managing state buffers with zero local VRAM overhead.
 - **The Brain (Cloud APIs):** Intelligent LLM routing connects specific tasks to their optimal architectures (DeepSeek for persistent coding, GPT-OSS for private reasoning, NVIDIA Nemotron for massive 1M context ingestion).
