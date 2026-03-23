@@ -15,7 +15,8 @@ def reasoning_node(state: KairosState) -> Dict[str, Any]:
     
     try:
         response = llm.invoke(prompt)
-        content = response.content.replace('```python', '').replace('```', '').strip()
+        content_str = str(response.content)
+        content = content_str.replace('```python', '').replace('```', '').strip()
         constraints = eval(content) if '[' in content else [content]
     except Exception as e:
         print(f"  [Error] Reasoner LLM failed: {e}")
@@ -36,7 +37,8 @@ def decomposition_node(state: KairosState) -> Dict[str, Any]:
     
     try:
         response = llm.invoke(prompt)
-        content = response.content.replace('```json', '').replace('```', '').strip()
+        content_str = str(response.content)
+        content = content_str.replace('```json', '').replace('```', '').strip()
         dep_graph = json.loads(content)
     except Exception as e:
          print(f"  [Error] Decomposer LLM failed: {e}")

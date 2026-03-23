@@ -22,9 +22,15 @@ class KairosState(TypedDict):
     
     # 4. Parallel Execution Phase
     shared_memory_buffer: Dict[str, str] # High-speed Librarian view
+    final_compiled_files: Dict[str, str] # Relative Path -> String Content
     
     # 5. Validation & Delivery (Phase 5 GitHub)
     validation_status: str
     generated_tools: Dict[str, str] # Filename -> Python Code 
     pr_approved: bool
     final_repo: Dict[str, str] # Filename -> Code mapping
+
+    # 6. Scout / Tool-Maker (extended runtime fields)
+    current_agent: str
+    anomalies_detected: List[str]
+    tool_requests: List[Dict[str, Any]]

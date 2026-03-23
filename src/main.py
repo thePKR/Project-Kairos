@@ -1,40 +1,57 @@
 import sys
 import os
-from dotenv import load_dotenv
 
 # Force Python to recognize the project root so "from src" works perfectly
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from langchain_core.messages import HumanMessage
-from langgraph.graph import StateGraph, END
-from langgraph.checkpoint.memory import MemorySaver
+# NOTE: Heavy packages (langchain, langgraph) are imported lazily inside
+# build_factory_graph() and __main__ to avoid loading ~200MB of native
+# libraries into RAM at import time, which was causing startup CPU spikes.
+# src.state is safe to import early — it's a pure TypedDict with no native libs.
 
+from dotenv import load_dotenv
 from src.state import KairosState
-from src.agents.think_tank import reasoning_node, decomposition_node, assignment_node
-
 load_dotenv()
 
 # ==========================================
 # Phase 2: The Huddle
 # ==========================================
 
-import os
 import subprocess
 
 def delivery_node(state: KairosState):
-    print("\n[Delivery] Packaging final swarm intelligence...")
+    print("\n[Delivery] Packaging final aligned objective...")
     
-    # 1. Deliver Analytical Markdown Reports
-    shared_memory = state.get("shared_memory_buffer", {})
-    if shared_memory:
-        output_dir = "deliverables/swarm_outputs"
+    final_files = state.get("final_compiled_files", {})
+    objective = state.get("user_objective", "output")
+    
+    if final_files:
+        import re
+        safe_name = re.sub(r'[^a-zA-Z0-9_\-]', '', objective.replace(" ", "_")).lower()
+        if safe_name.startswith("create_a_code_to_"):
+            safe_name = safe_name.replace("create_a_code_to_", "")
+        safe_name = safe_name[:50].strip("_")
+        if not safe_name:
+            safe_name = "objective_output"
+            
+        output_dir = os.path.join("deliverables", safe_name)
         os.makedirs(output_dir, exist_ok=True)
-        for task_key, content in shared_memory.items():
-            safe_name = task_key.replace(" ", "_").replace("/", "_").lower()
-            file_path = os.path.join(output_dir, f"{safe_name}.md")
-            with open(file_path, "w", encoding="utf-8") as f:
-                f.write(f"# Swarm Output: {task_key}\n\n{content}")
-            print(f" -> Saved artifact: {file_path}")
+        
+        # Cleanup old fragments so we don't bloat the user's system
+        shared_memory = state.get("shared_memory_buffer", {})
+        for path in shared_memory.values():
+            if os.path.exists(path):
+                os.remove(path)
+                
+        print(f"\n[Delivery] Writing structured file tree to: {output_dir}")
+        for rel_path, content in final_files.items():
+            # Create nested directories if LLM responded with "src/app.py" etc
+            full_path = os.path.join(output_dir, rel_path)
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
+            
+            with open(full_path, "w", encoding="utf-8") as f:
+                f.write(content)
+            print(f" -> Generated: {rel_path}")
             
     # 2. Deliver & Commit Synthesized Python Tools (Phase 5 Autonomous Git Push)
     generated_tools = state.get("generated_tools", {})
@@ -98,29 +115,130 @@ def huddle_node(state: KairosState):
 # ==========================================
 # Phase 3/4: Execution, Validation, Delivery
 # ==========================================
-from src.utils import get_llm
 
 def parallel_execution_node(state: KairosState):
     print("[Librarian] Initiating Parallel Sandboxes and syncing Shared Memory...")
     
+    # Lazy import — only pulled into RAM when this node actually runs
+    from src.utils import get_llm
+
     dep_graph = state.get("dependency_graph", {})
     objective = state.get("user_objective", "")
+    
+    # Stream outputs straight to disk instead of accumulating in RAM.
+    # Each result is written and the string reference dropped before the next
+    # LLM call starts, keeping peak memory to ~1 response at a time.
+    import re
+    safe_name = re.sub(r'[^a-zA-Z0-9_\-]', '', objective.replace(" ", "_")).lower()
+    if safe_name.startswith("create_a_code_to_"):
+        safe_name = safe_name.replace("create_a_code_to_", "")
+    safe_name = safe_name[:50].strip("_")
+    if not safe_name:
+        safe_name = "objective_output"
+        
+    output_dir = os.path.join("deliverables", safe_name)
+    os.makedirs(output_dir, exist_ok=True)
     shared_memory = {}
     
-    # We use systems_engineer (DeepSeek, or NVIDIA fallback) for execution
     llm = get_llm(role="systems_engineer")
     
-    for module_name, module_desc in dep_graph.items():
-        print(f"  > [Worker] Synthesizing {module_name}...")
-        prompt = f"Project Objective: {objective}\nYour Specific Task: {module_name} - {module_desc}\nProvide a detailed, beautifully formatted Markdown report solving this specific module. Focus strictly on actionable analysis and actionable architecture readable by a Director."
+    import concurrent.futures
+
+    def _process_module(module_item):
+        m_name, m_desc = module_item
+        print(f"  > [Worker] Synthesizing {m_name}...")
+        prompt = (
+            f"Project Objective: {objective}\n"
+            f"Your Specific Task: {m_name} - {m_desc}\n"
+            "Provide a detailed, beautifully formatted Markdown report solving this "
+            "specific module. Focus strictly on actionable analysis and actionable "
+            "architecture readable by a Director."
+        )
         
         try:
             response = llm.invoke(prompt)
-            shared_memory[module_name] = response.content
+            content = response.content
         except Exception as e:
-            shared_memory[module_name] = f"Error processing {module_name}: {str(e)}"
+            content = f"Error processing {m_name}: {str(e)}"
+        
+        # Write to disk immediately — free the response object from RAM
+        safe_file_name = m_name.replace(" ", "_").replace("/", "_").lower()
+        file_path = os.path.join(output_dir, f"{safe_file_name}.md")
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(f"# Swarm Output: {m_name}\n\n{content}")
+        print(f"    -> Streamed to disk: {file_path}")
+        
+        return m_name, file_path
+
+    # Execute all modules concurrently via threads
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        results = executor.map(_process_module, dep_graph.items())
+        
+        for m_name, path in results:
+            shared_memory[m_name] = path
             
     return {"shared_memory_buffer": shared_memory}
+
+import re
+def synthesis_node(state: KairosState):
+    print("\n[Synthesis] Consolidating architecture and generating final executable product...")
+    from src.utils import get_llm
+    llm = get_llm(role="systems_engineer")
+    
+    objective = state.get("user_objective", "")
+    shared_memory = state.get("shared_memory_buffer", {})
+    
+    # Read the fragmented module pieces directly from disk
+    consolidated_text = []
+    for module_name, path in shared_memory.items():
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                consolidated_text.append(f.read())
+                
+    full_context = "\n\n".join(consolidated_text)
+    prompt = (
+        f"You are the Lead Systems Architect. The engineering swarm has analyzed the following objective:\n"
+        f"'{objective}'\n\n"
+        f"They produced the following fragmented architectural components:\n"
+        f"=====\n{full_context}\n=====\n\n"
+        "Your task: Consolidate everything into a fully scalable, multi-file software repository. Generate the frontend, backend, database connectors, and documentation in their appropriate folders.\n"
+        "Output EACH file strictly using the following delimiter format:\n\n"
+        "__FILE_START__::relative/path/to/filename.ext\n"
+        "[File content goes here]\n"
+        "__FILE_END__\n\n"
+        "Make sure to include ALL files necessary to run the project. You may generate as many files as needed."
+    )
+    
+    final_files = {}
+    try:
+        response = llm.invoke(prompt)
+        content = response.content
+        
+        # Parse all files matching the syntax
+        pattern = r"__FILE_START__::(.*?)\n(.*?)\n?__FILE_END__"
+        matches = re.finditer(pattern, content, re.DOTALL)
+        
+        for match in matches:
+            file_path = match.group(1).strip()
+            file_content = match.group(2).strip()
+            
+            # Clean up markdown code blocks if the LLM wrapped it internally
+            if file_content.startswith("```"):
+                file_content = file_content.split("\n", 1)[-1]
+            if file_content.endswith("```"):
+                file_content = file_content.rsplit("\n", 1)[0]
+                
+            final_files[file_path] = file_content.strip()
+            
+        if not final_files:
+            print("  [Warning] LLM failed to output files using the correct delimiter format.")
+             
+    except Exception as e:
+        print(f"  [Error] Synthesis LLM failed: {e}")
+        
+    return {
+        "final_compiled_files": final_files
+    }
 
 def validation_gate_node(state: KairosState):
     print("[Validation Gate] Running Cross-Peer Code Review...")
@@ -130,6 +248,14 @@ def validation_gate_node(state: KairosState):
 # Build Graph Structure
 # ==========================================
 def build_factory_graph():
+    # Lazy imports — LangGraph and LangChain core pull in ~150-200MB of
+    # native libs. Loading them here (not at module level) means the process
+    # stays lean until the user actually confirms an objective.
+    from langchain_core.messages import HumanMessage  # noqa: F401 (re-exported)
+    from langgraph.graph import StateGraph, END
+    from langgraph.checkpoint.memory import MemorySaver
+    from src.agents.think_tank import reasoning_node, decomposition_node, assignment_node
+
     workflow = StateGraph(KairosState)
     
     # Add Nodes
@@ -138,6 +264,7 @@ def build_factory_graph():
     workflow.add_node("assignment", assignment_node)
     workflow.add_node("huddle", huddle_node)
     workflow.add_node("parallel_execution", parallel_execution_node)
+    workflow.add_node("synthesis", synthesis_node)
     workflow.add_node("validation", validation_gate_node)
     workflow.add_node("github_pr", github_pr_node)
     workflow.add_node("delivery", delivery_node)
@@ -155,7 +282,8 @@ def build_factory_graph():
         
     workflow.add_conditional_edges("huddle", huddle_router)
     
-    workflow.add_edge("parallel_execution", "validation")
+    workflow.add_edge("parallel_execution", "synthesis")
+    workflow.add_edge("synthesis", "validation")
     workflow.add_edge("validation", "github_pr")
     
     def pr_router(state: KairosState):
@@ -171,9 +299,16 @@ def build_factory_graph():
     return workflow.compile(checkpointer=memory, interrupt_before=["huddle", "github_pr"]) 
 
 if __name__ == "__main__":
-    app = build_factory_graph()
+    # Get the objective BEFORE building the graph so the user isn't waiting
+    # while 200MB of LangGraph native libs load in the background.
     print("Project Kairos : Software Factory Initialized.")
     objective = input("\nAwaiting Objective: ")
+
+    # Now do the heavy lifting — user has already given us the goal
+    from langchain_core.messages import HumanMessage
+    print("[Boot] Loading engine...", end=" ", flush=True)
+    app = build_factory_graph()
+    print("Ready.")
     
     # Must use config state for memory resumption
     config = {"configurable": {"thread_id": "session_alpha"}}
