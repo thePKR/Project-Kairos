@@ -16,6 +16,7 @@ class KairosState(TypedDict):
     system_constraints: List[str]
     dependency_graph: Dict[str, Any]  # The JSON-based graph
     worker_assignments: Dict[str, str] # e.g. {"Login UI": "Agent Profile 3"}
+    interface_contract: str  # Shared API contract injected into every worker prompt
     
     # 3. The Huddle Phase
     huddle_plan_markdown: str

@@ -157,11 +157,23 @@ def parallel_execution_node(state: KairosState):
     def _process_module(module_item):
         m_name, m_desc = module_item
         print(f"  > [Worker] Synthesizing {m_name}...")
+        
+        # Inject the shared Interface Contract so all workers produce compatible code
+        contract = state.get("interface_contract", "")
         prompt = (
             f"Project Objective: {objective}\n"
-            f"Your Specific Task: {m_name} - {m_desc}\n"
+            f"Your Specific Task: {m_name} - {m_desc}\n\n"
+        )
+        if contract:
+            prompt += (
+                f"=== SHARED INTERFACE CONTRACT (ALL WORKERS MUST FOLLOW) ===\n"
+                f"{contract}\n"
+                f"=== END CONTRACT ===\n\n"
+            )
+        prompt += (
             "Provide a detailed, beautifully formatted Markdown report solving this "
-            "specific module. Focus strictly on actionable analysis and actionable "
+            "specific module. Include CONCRETE Python code that follows the Interface Contract exactly. "
+            "Every code block must have correct imports. Focus strictly on actionable "
             "architecture readable by a Director."
         )
         
@@ -206,12 +218,62 @@ def synthesis_node(state: KairosState):
                 consolidated_text.append(f.read())
                 
     full_context = "\n\n".join(consolidated_text)
+    
+    # Load known packages for grounding
+    import json as _json
+    known_packages = ""
+    pkg_path = os.path.join(os.path.dirname(__file__), "resources", "known_packages.json")
+    if os.path.exists(pkg_path):
+        with open(pkg_path, "r") as pf:
+            pkg_data = _json.load(pf)
+            known_packages = ", ".join(pkg_data.keys())
+    
+    # Inject the interface contract into synthesis
+    contract = state.get("interface_contract", "")
+    
+    # ============ PASS 1: Structure ============
+    structure_prompt = (
+        f"You are the Lead Systems Architect. Given this objective:\n"
+        f"'{objective}'\n\n"
+        f"And these architectural components from the engineering swarm:\n"
+        f"=====\n{full_context[:6000]}\n=====\n\n"
+    )
+    if contract:
+        structure_prompt += (
+            f"=== INTERFACE CONTRACT (MANDATORY) ===\n{contract}\n=== END ===\n\n"
+        )
+    structure_prompt += (
+        "STEP 1 OF 2: Output ONLY the file tree with function signatures.\n"
+        "For each file, list the filename and all function signatures with type hints.\n"
+        "Example:\n"
+        "FILE: main.py\n"
+        "  - def main() -> None\n"
+        "  - imports: streamlit, os, dotenv\n"
+        "FILE: scraper/web_scraper.py\n"
+        "  - def scrape_industry(name: str) -> List[str]\n"
+        "  - imports: requests, bs4, concurrent.futures\n\n"
+        "List ALL files necessary for the project. Do not generate implementations yet."
+    )
+    
+    file_structure = ""
+    try:
+        struct_response = llm.invoke(structure_prompt)
+        file_structure = str(struct_response.content)
+        print("  [Pass 1] File structure mapped.")
+    except Exception as e:
+        print(f"  [Pass 1 Error] {e}")
+    
+    # ============ PASS 2: Implementation ============
     prompt = (
         f"You are the Lead Systems Architect. The engineering swarm has analyzed the following objective:\n"
         f"'{objective}'\n\n"
-        f"They produced the following fragmented architectural components:\n"
+        f"Here is the file structure and function signatures you MUST follow:\n"
+        f"=====\n{file_structure}\n=====\n\n"
+        f"Here is the full architectural context from the swarm:\n"
         f"=====\n{full_context}\n=====\n\n"
     )
+    if contract:
+        prompt += f"=== INTERFACE CONTRACT (MANDATORY) ===\n{contract}\n=== END ===\n\n"
     
     # Self-correction: if the sandbox found errors, inject them
     sandbox_error = state.get("sandbox_error_log", "")
@@ -225,12 +287,22 @@ def synthesis_node(state: KairosState):
         )
     
     prompt += (
-        "Your task: Consolidate everything into a fully scalable, multi-file software repository. Generate the frontend, backend, database connectors, and documentation in their appropriate folders.\n"
-        "Output EACH file strictly using the following delimiter format:\n\n"
+        "STEP 2 OF 2: Now generate the COMPLETE implementation for each file.\n"
+        "CRITICAL RULES:\n"
+        "- EVERY Python file MUST start with all necessary imports (os, json, etc.)\n"
+        "- NEVER use deprecated APIs (no openai.Completion.create)\n"
+        "- Use modern OpenAI v1+: from openai import OpenAI\n"
+        "- requirements.txt must have NO version pins, just package names\n"
+        "- Do NOT include stdlib packages in requirements.txt\n"
+    )
+    if known_packages:
+        prompt += f"- ONLY use packages from this known list: {known_packages}\n"
+    prompt += (
+        "\nOutput EACH file strictly using the following delimiter format:\n\n"
         "__FILE_START__::relative/path/to/filename.ext\n"
         "[File content goes here]\n"
         "__FILE_END__\n\n"
-        "Make sure to include ALL files necessary to run the project. You may generate as many files as needed."
+        "Make sure to include ALL files necessary to run the project."
     )
     
     final_files = {}
@@ -265,8 +337,53 @@ def synthesis_node(state: KairosState):
     }
 
 def validation_gate_node(state: KairosState):
-    print("[Validation Gate] Running Cross-Peer Code Review...")
-    return {"validation_status": "PASS"}
+    """Cross-file AST validation: checks imports, detects missing os/json, and verifies structure."""
+    print("[Validation Gate] Running Cross-File AST Analysis...")
+    import ast
+    
+    final_files = state.get("final_compiled_files", {})
+    issues = []
+    
+    for filepath, content in final_files.items():
+        if not filepath.endswith(".py"):
+            continue
+        
+        try:
+            tree = ast.parse(content)
+        except SyntaxError as e:
+            issues.append(f"SyntaxError in {filepath}: {e}")
+            continue
+        
+        # Collect all imported names
+        imported_names = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    imported_names.add(alias.name.split(".")[0])
+            elif isinstance(node, ast.ImportFrom):
+                if node.module:
+                    imported_names.add(node.module.split(".")[0])
+        
+        # Check for common missing imports
+        source = content
+        if "os.environ" in source or "os.path" in source or "os.makedirs" in source:
+            if "os" not in imported_names:
+                issues.append(f"{filepath}: uses 'os' but never imports it")
+        if "json.loads" in source or "json.dumps" in source:
+            if "json" not in imported_names:
+                issues.append(f"{filepath}: uses 'json' but never imports it")
+        if "re." in source:
+            if "re" not in imported_names:
+                issues.append(f"{filepath}: uses 're' but never imports it")
+    
+    if issues:
+        print(f"  -> Found {len(issues)} issue(s):")
+        for issue in issues:
+            print(f"     ⚠️ {issue}")
+    else:
+        print("  -> ✅ All files passed AST validation.")
+    
+    return {"validation_status": "PASS" if not issues else f"ISSUES: {'; '.join(issues)}"}
 
 def sandbox_node(state: KairosState):
     """Executes generated code in an isolated subprocess and captures errors."""
