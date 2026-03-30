@@ -14,3 +14,6 @@ __pycache__/
 
 # LLM Outputs
 deliverables/
+
+# RAG Session Logs (runtime-generated)
+src/rag/sessions/

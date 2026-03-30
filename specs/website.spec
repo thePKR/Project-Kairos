@@ -1,0 +1,490 @@
+can you make this website have something like this dynamic website : 
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0;">
+        <title>ILAB - Digital Creative Studio</title>
+        <meta name="description" content="Dal 2009, ilab è un digital creative studio di origini partenopee specializzato in branding, web design e advertising." />
+        <link href="css/style.css" rel="stylesheet"/>
+        <link href="css/mediaquery.css" rel="stylesheet"/>
+        <link href="css/portfolio_style.css" rel="stylesheet"/>
+        <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+        <script src="js/libs/anime.min.js"></script>
+        <script src="js/libs/jsband-min.js"></script>
+        <script src="js/blob-min.js"></script>
+        <script src="js/main.js"></script>
+        <script>document.documentElement.className="js";var supportsCssVars=function(){var e,t=document.createElement("style");return t.innerHTML="root: { --tmp-var: bold; }",document.head.appendChild(t),e=!!(window.CSS&&window.CSS.supports&&window.CSS.supports("font-weight","var(--tmp-var)")),t.parentNode.removeChild(t),e};supportsCssVars()||alert("Please view this demo in a modern browser that supports CSS Variables.");</script>
+
+        <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+        <link rel="manifest" href="img/site.webmanifest">
+        <link rel="mask-icon" href="img/safari-pinned-tab.svg" color="#5bbad5">
+        <meta name="msapplication-TileColor" content="#da532c">
+        <meta name="theme-color" content="#ffffff">
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="ILAB - Digital creative studio" />
+        <meta property="og:url" content="https://www.ilabsolutions.it/" />
+        <meta property="og:image" content="https://www.ilabsolutions.it/img/300x200.jpg" />
+        <meta property="og:image:width" content="300px" />
+        <meta property="og:image:height" content="200px" />
+        <meta property="og:site_name" content="ilab" />
+        <meta property="og:description" content="Dal 2009, ILAB è un digital creative studio di origini partenopee specializzato in branding, web design e advertising." />
+        <meta name="twitter:title" content="ILAB - Digital creative studio">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="https://www.ilabsolutions.it">
+        <meta name="twitter:creator" content="ilab">
+        <meta name="twitter:description" content="Dal 2009, ILAB è un digital creative studio di origini partenopee specializzato in branding, web design e advertising.">
+        <meta name="twitter:image" content="https://www.ilabsolutions.it/img/800x418.jpg">
+	
+	<!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-5JM6J68');</script>
+        <!-- End Google Tag Manager -->
+
+
+        <!-- Global site tag (gtag.js) - Google ADS -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-992287081"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+	    gtag('config', 'UA-38767265-1');//Analytics
+
+            gtag('config', 'AW-992287081');
+            function gtag_report_conversion_sap(url) {
+		var callback = function () {
+			if (typeof(url) != 'undefined') {
+				window.location = url;
+			}
+		};
+		gtag('event', 'Click', {
+		  'event_category' : 'Click su testo',
+		  'event_label' : 'testo'
+		});
+		gtag('event', 'conversion', { 'send_to': 'AW-992287081/-gZCCN_D76QBEOmylNkD', 'event_callback': callback });
+		return false;
+	    }
+            function gtag_report_conversion_eb(url) {
+		var callback = function () {
+			if (typeof(url) != 'undefined') {
+				window.location = url;
+			}
+		};
+		gtag('event', 'Click', {
+		  'event_category' : 'Click su pulsante',
+		  'event_label' : 'pulsante'
+		});
+		gtag('event', 'conversion', { 'send_to': 'AW-992287081/N5qyCK3G6qQBEOmylNkD', 'event_callback': callback });
+		return false;
+	    }
+        </script>
+
+    </head>
+    <body class="mainBody" id="start">
+    <div class="button-navigator">
+        
+        <!-- Google Tag Manager (noscript) -->
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5JM6J68"
+        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <!-- End Google Tag Manager (noscript) -->
+        <!-- Facebook Pixel Code -->
+        <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window,document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+         fbq('init', '378866519373662'); 
+        fbq('track', 'PageView');
+        </script>
+        <noscript>
+         <img height="1" width="1" alt="Facebook Pixel" src="https://www.facebook.com/tr?id=378866519373662&ev=PageView&noscript=1"/>
+        </noscript>
+        <!-- End Facebook Pixel Code -->
+        
+        
+        <div id="blob_container" style="position:fixed; width: 100vw; height: 100vh;top:0;left:0; background: white; z-index:-1;"></div>
+        
+        <section>    
+        <div class="container">
+            <div class="box box-header">
+                <h1 id="intro">
+                    <i class="no-wrap">
+                        <span>d</span><span>i</span><span>g</span><span>i</span><span>t</span><span>a</span><span>l</span>
+                    </i>
+                    <i class="no-wrap">
+                        <span>c</span><span>r</span><span>e</span><span>a</span><span>t</span><span>i</span><span>v</span><span>e</span>
+                    </i>
+                    <i class="no-wrap">
+                        <span>s</span><span>t</span><span>u</span><span>d</span><span>i</span><span>o</span>
+                    </i>
+                </h1>
+            </div>
+        </div>
+        </section>
+        <section>
+        <div class="container">
+            <span class="delegato" id="delegato-testo-1"></span>
+            <div class="box box-pres" id="text1">
+                <p>
+                    <span>Dal</span>
+                    <span>2009,</span>
+                    <span>ILAB</span>
+                    <span>è</span>
+                    <span>un</span>
+                    <span>digital</span>
+                    <span>creative</span>
+                    <span>studio</span>
+                    <span>di</span>
+                    <span>origini</span>
+                    <span>partenopee</span>
+                    <span>specializzato</span>
+                    <span>in</span>
+                    <span>branding,</span>
+                    <span>web</span>
+                    <span>design</span>
+                    <span>e</span>
+                    <span>advertising.</span>
+                </p>
+                <p>
+                    <span>Un</span>
+                    <span>laboratorio</span>
+                    <span>che</span>
+                    <span>si</span>
+                    <span>dedica</span>
+                    <span>ai</span>
+                    <span>propri</span>
+                    <span>clienti</span>
+                    <span>con</span>
+                    <span>stile</span>
+                    <span>italiano,</span>
+                    <span>attenzione</span>
+                    <span>ai</span>
+                    <span>particolari</span>
+                    <span>e</span>
+                    <span>cura</span>
+                    <span>sartoriale.</span>
+                </p>
+            </div>
+        </div>
+        </section>    
+        <section>
+        <div class="container">
+          <span class="delegato" id="delegato-testo-2"></span>
+            <div class="box box-customers">
+                <h2 id="customers"><span id="collaborations">
+                    <span>c</span><span>l</span><span>i</span><span>e</span><span>n</span><span>t</span><span>i</span></span>
+                </h2>
+                <ul class="customer customer-clients">
+                    <li><img src="img/clienti/001_01.png" alt="Mc Donald" /></li>
+                    <li><img src="img/clienti/001_02.png" alt="Camomilla" /></li>
+                    <li><img src="img/clienti/001_03.png" alt="Lacoste" /></li>
+                    <li><img src="img/clienti/001_04.png" alt="Artigli" /></li>
+                    <li><img src="img/clienti/001_05.png" alt="Termoplast" /></li>
+                    <li><img src="img/clienti/001_06.png" alt="Revise Concept" /></li>
+                    <li><img src="img/clienti/001_08.png" alt="Kostumn" /></li>
+                    <li><img src="img/clienti/001_07.png" alt="Minimal" /></li>
+                    <li><img src="img/clienti/001_09.png" alt="Gallistrings" /></li>
+                    <li><img src="img/clienti/001_10.png" alt="Sabox" /></li>
+                    <li><img src="img/clienti/001_11.png" alt="Formaperta" /></li>
+                    <li><img src="img/clienti/001_13.png" alt="Atelier Asap" /></li>
+                </ul>
+            </div>
+        </div>
+        </section>
+        <!--div id="box-portfolio">    
+            <main> 
+                <div class="frame">
+                    <div class="frame__indicator"></div>
+                </div>            
+                <div class="strip-outer">  
+                    <div class="strip-inner">
+                        <div class="draggable"></div>
+                            <div class="strip">
+                                <div class="strip-item" data-index="1" data-title="Titolo 1" data-subtitle="sottotitolo 1">
+                                    <div class="img-outer"><div class="img-inner"><img src="img/portfolio/ui_1.png" alt="ui_01"></div></div>
+                                        <span class="strip-item-number"><a class="strip-item-link"><span>UI design - 01</span></a><span class="strip-item-plus"></span></span>
+                                </div>
+                                <div class="strip-item" data-index="2" data-title="Titolo 2" data-subtitle="sottotitolo 2">
+                                    <div class="img-outer"><div class="img-inner"><img src="img/portfolio/ui_2.png" alt="ui_02"></div></div>
+                                        <span class="strip-item-number"><a class="strip-item-link"><span>UI design - 02</span></a><span class="strip-item-plus"></span></span>
+                                </div>
+                                <div class="strip-item" data-index="3" data-title="Titolo 3" data-subtitle="sottotitolo 3">
+                                    <div class="img-outer"><div class="img-inner"><img src="img/portfolio/ui_3.png" alt="ui_03"></div></div>
+                                        <span class="strip-item-number"><a class="strip-item-link"><span>UI design - 03</span></a><span class="strip-item-plus"></span></span>
+                                </div>
+                                <div class="strip-item" data-index="4" data-title="Titolo 4" data-subtitle="sottotitolo 4">
+                                    <div class="img-outer"><div class="img-inner"><img src="img/portfolio/ui_1.png" alt="ui_01"></div></div>
+                                        <span class="strip-item-number"><a class="strip-item-link"><span>UI design - 01</span></a><span class="strip-item-plus"></span></span>
+                                </div>
+                                <div class="strip-item" data-index="5" data-title="Titolo 5" data-subtitle="sottotitolo 5">
+                                    <div class="img-outer"><div class="img-inner"><img src="img/portfolio/ui_2.png" alt="ui_02"></div></div>
+                                        <span class="strip-item-number"><a class="strip-item-link"><span>UI design - 02</span></a><span class="strip-item-plus"></span></span>
+                                </div>
+                                <div class="strip-item" data-index="6" data-title="Titolo 6" data-subtitle="sottotitolo 6">
+                                    <div class="img-outer"><div class="img-inner"><img src="img/portfolio/ui_3.png" alt="ui_03"></div></div>
+                                        <span class="strip-item-number"><a class="strip-item-link"><span>UI design - 03</span></a><span class="strip-item-plus"></span></span>
+                                </div>
+                                <div class="strip-item" data-index="7" data-title="Titolo 7" data-subtitle="sottotitolo 7">
+                                    <div class="img-outer"><div class="img-inner"><img src="img/portfolio/ui_1.png" alt="ui_01"></div></div>
+                                        <span class="strip-item-number"><a class="strip-item-link"><span>UI design - 01</span></a><span class="strip-item-plus"></span></span>
+                                </div>
+                                <div class="strip-item" data-index="8" data-title="Titolo 8" data-subtitle="sottotitolo 8">
+                                    <div class="img-outer"><div class="img-inner"><img src="img/portfolio/ui_2.png" alt="ui_02"></div></div>
+                                        <span class="strip-item-number"><a class="strip-item-link"><span>UI design - 02</span></a><span class="strip-item-plus"></span></span>
+                                </div>
+                                <div class="strip-item" data-index="9" data-title="Titolo 9" data-subtitle="sottotitolo 9">
+                                    <div class="img-outer"><div class="img-inner"><img src="img/portfolio/ui_3.png" alt="ui_03"></div></div>
+                                        <span class="strip-item-number"><a class="strip-item-link"><span>UI design - 03</span></a><span class="strip-item-plus"></span></span>
+                                </div>
+                                <div class="strip-item" data-index="10" data-title="Titolo 10" data-subtitle="sottotitolo 10">
+                                    <div class="img-outer"><div class="img-inner"><img src="img/portfolio/ui_1.png" alt="ui_01"></div></div>
+                                        <span class="strip-item-number"><a class="strip-item-link"><span>UI design - 01</span></a><span class="strip-item-plus"></span></span>
+                                </div>
+                                <div class="strip-item" data-index="11" data-title="Titolo 11" data-subtitle="sottotitolo 11">
+                                    <div class="img-outer"><div class="img-inner"><img src="img/portfolio/ui_2.png" alt="ui_02"></div></div>
+                                        <span class="strip-item-number"><a class="strip-item-link"><span>UI design - 02</span></a><span class="strip-item-plus"></span></span>
+                                </div>
+                                <div class="strip-item" data-index="12" data-title="Titolo 12" data-subtitle="sottotitolo 12">
+                                    <div class="img-outer"><div class="img-inner"><img src="img/portfolio/ui_3.png" alt="ui_03"></div></div>
+                                        <span class="strip-item-number"><a class="strip-item-link"><span>UI design - 03</span></a><span class="strip-item-plus"></span></span>
+                                </div>                            
+                            </div>    
+                    </div> 
+                        <div class="strip-cover">
+                            <div class="box-strip" id="box-strip">
+                            <h2 class="strip-cover__title">ILAB portfolio</h2>
+                            <span class="strip-cover__subtitle">2019</span>
+                            </div>
+                        </div>                
+                </div>
+                <div class="content">
+                    <article class="content-item">
+                        <div class="img-outer img-outer-content">
+                            <div class="img-inner img-inner--content"><img src="img/portfolio/ui_1.png" alt="ui_02"></div>
+                        </div>
+                            <div class="content-item-copy">
+                                <h2 class="content-item-title">UI design - 01</h2>
+                                <p class="content-item-text">Lorem Ipsum è un testo segnaposto utilizzato nel settore della tipografia e della stampa. Lorem Ipsum è considerato il testo segnaposto standard sin dal sedicesimo secolo, quando un anonimo tipografo prese una cassetta di caratteri e li assemblò per preparare un testo campione.</p>
+                            </div>
+                    </article>
+                    <article class="content-item">
+                        <div class="img-outer img-outer-content">
+                            <div class="img-inner img-inner--content"><img src="img/portfolio/ui_2.png" alt="ui_02"></div>
+                        </div>
+                            <div class="content-item-copy">
+                                <h2 class="content-item-title">UI design - 02</h2>
+                                <p class="content-item-text">Lorem Ipsum è un testo segnaposto utilizzato nel settore della tipografia e della stampa. Lorem Ipsum è considerato il testo segnaposto standard sin dal sedicesimo secolo, quando un anonimo tipografo prese una cassetta di caratteri e li assemblò per preparare un testo campione.</p>
+                            </div>
+                    </article>
+                    <article class="content-item">
+                        <div class="img-outer img-outer-content">
+                            <div class="img-inner img-inner--content"><img src="img/portfolio/ui_3.png" alt="ui_02"></div>
+                        </div>
+                            <div class="content-item-copy">
+                                <h2 class="content-item-title">UI design - 03</h2>
+                                <p class="content-item-text">Lorem Ipsum è un testo segnaposto utilizzato nel settore della tipografia e della stampa. Lorem Ipsum è considerato il testo segnaposto standard sin dal sedicesimo secolo, quando un anonimo tipografo prese una cassetta di caratteri e li assemblò per preparare un testo campione.</p>
+                            </div>
+                    </article> 
+                    <button class="content-close" aria-label="Close content">close</button>
+                </div>
+            </main>
+        </div-->    
+            <div class="aa-content">
+              <span class="delegato" id="delegato-testo-3"></span>
+                <div id="award-agency" class="container black">
+                    <div class="box" id="awwwards">
+                        <h2 id="aa-title">
+                            <span>P</span><span>r</span><span>e</span><span>m</span><span>i</span> <span>e</span> <span>r</span><span>i</span><span>c</span><span>o</span><span>n</span><span>o</span><span>s</span><span>c</span><span>i</span><span>m</span><span>e</span><span>n</span><span>t</span><span>i</span>
+                        </h2>
+                        <span id="award-text">
+                            <span>Ogni</span>
+                            <span>lavoro</span>
+                            <span>rappresenta</span>
+                            <span>una</span>
+                            <span>sfida</span>
+
+                            <span>a</span>
+                            <span>cui</span>
+                            <span>non</span>
+                            <span>sappiamo</span>
+                            <span>rinunciare.</span>
+                        </span>
+                        <ul id="aa-loghi" class="customer customer-awwwards">
+                            <li>
+                                <div class="logo_placeholder" style="background-image:url(img/award/awwwards_black.png)"><img src="img/award/awwwards.png" alt="award1"/></div>
+                                <span class="not_animated" data-count="2">2</span>
+                            </li>
+                            <li>
+                                <div class="logo_placeholder" style="background-image:url(img/award/cssda_black.png)"><img src="img/award/cssda.png" alt="award1"/></div>
+                                <span class="not_animated" data-count="4">4</span>
+                            </li>
+                            <li>
+                                <div class="logo_placeholder" style="background-image:url(img/award/csswinner_black.png)"><img src="img/award/csswinner.png" alt="award1"/></div>
+                                <span class="not_animated" data-count="1">1</span>
+                            </li>
+                         </ul>
+                    </div>
+                </div>
+            </div>
+        <div class="container">
+          <span class="delegato" id="delegato-testo-4"></span>
+            <div class="box">
+                <div class="container-box-flex">
+                    <div class="box-flex">
+                        <div class="box-flex-left">
+                            <h2 id="services"><span>s</span><span>e</span><span>r</span><span>v</span><span>i</span><span>z</span><span>i</span></h2>
+                        </div>
+                        <div class="box-flex-right">
+                            <div class="box-works">
+                                <div class="work work-1">
+                                    <h3>Branding</h3>
+                                    <ul  id="branding">
+                                        <li>Analisi e Strategia</li>
+                                        <li>Direzione Creativa</li>
+                                        <li>Direzione Artistica</li>
+                                        <li>Visual Identity</li>
+                                        <li>Tone of Voice</li>
+                                        <li>Naming</li>
+                                        <li>Copywriting</li>
+                                        <li>Storytelling</li>
+                                        <li>Produzione Foto e Video</li>
+                                        <li>Illustrazioni</li>
+                                    </ul>
+                                </div>
+                                <div class="work work-2">
+                                    <h3>Web Design</h3>
+                                    <ul  id="web-design">
+                                        <li>Landing Page</li>
+                                        <li>Siti Web</li>
+                                        <li>eCommerce</li>
+                                        <li>Web App</li>
+                                        <li>UI / UX</li>
+                                        <li>Joomla + VirtueMart</li>
+                                        <li>Magento</li>
+                                        <li>API Integration</li>
+                                        <li>Direzione Tecnica</li>
+                                    </ul>
+                                </div>
+                                <div class="work work-3">
+                                    <h3>Advertising</h3>
+                                    <ul  id="advertising">
+                                        <li>Campagne Pubblicitarie</li>
+                                        <li>SEO</li>
+                                        <li>SEM</li>
+                                        <li>Google Ads</li>
+                                        <li>Social Media Ads</li>
+                                    </ul>
+                                </div>
+                                <div class="work work-4">
+                                    <h3>Social Media</h3>
+                                    <ul  id="social-media">
+                                        <li>Strategia</li>
+                                        <li>Social Media Management</li>
+                                        <li>Community Management</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bottom_nav">
+            <div id="edit_button" class="edit_button" onclick="return gtag_report_conversion_eb();">
+            <!-- div id="edit_button" class="edit_button" -->
+                <span class="edit_button_point"></span>
+                <span class="edit_button_text"></span>
+                <span class="edit_button_pencil"></span>
+            </div>
+        </div>
+    </div>
+        <div class="cursor">
+            <div class="cursor__inner cursor-circle"></div>
+            <div class="cursor__inner cursor-dot"></div>
+        </div>
+        <footer>
+            <div class="container black">
+              <span class="delegato" id="delegato-testo-5"></span>  
+                <div class="box">
+                    <div class="top_footer">
+                        <div class="box-title">
+                            <h1 id="ftitle" onclick="return gtag_report_conversion_sap();">
+                            <!--h1 id="ftitle" -->
+                                <i>
+                                    <span>s</span><span>t</span><span>a</span><span>r</span><span>t</span>
+                                </i>
+                                <i>
+                                    <span>a</span>
+                                </i>
+                                <i>
+                                    <span>p</span><span>r</span><span>o</span><span>j</span><span>e</span><span>c</span><span>t</span>
+                                </i>
+                            </h1>
+                            <div class="contact_overlay"></div>
+                        </div>
+                    </div>
+                    <div class="bottom_footer">
+                        <div class="footer-box">
+                            <div class="footer-box-left">
+                            <address id="address">ILAB di Giuseppe Manzavino<br/>Via G. Mazzini, 6<br />84016 - Pagani, Salerno</address>
+                            </div>
+                                <div class="footer-box-center">
+                                <ul>
+                                    <li><a id="mail" href="mailto:info@ilabsolutions.it" cursor-hover>info@ilabsolutions.it</a></li>
+                                    <li>+ (39) 081 3443 748</li>
+                                </ul>    
+                                </div>
+                                    <div class="footer-box-right">
+                                    <ul>
+                                        <li><a href="https://www.facebook.com/ilabdigitalcreativestudio" target="_blank" rel="nofollow" cursor-hover>Facebook</a></li>
+                                        <li><a href="https://www.instagram.com/ilabsolutions" target="_blank" rel="nofollow" cursor-hover>Instagram</a></li>
+                                        <li><a href="https://www.linkedin.com/company/ilabsolutions" target="_blank" rel="nofollow" cursor-hover>LinkedIn</a></li>
+                                    </ul>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+        </footer>
+        <div class="box box-topnav">
+            <div class="topnav" id="mytopnav">
+                <div class="logo" id="logo">
+                    <a href="#start"><img src="img/logo.png" alt="ilab logo"/></a>
+                </div>
+            </div>
+        </div>
+        <span class="edit_button_overlay"></span>
+        <iframe src="contact_form.php" id="contactframe" frameborder="0"></iframe>
+        <script src="js/cursor.js"></script>
+        <!-- script src="js/skew.js"></script -->
+        <!--script src="js/imagesloaded.pkgd.min.js"></script>
+        <script src="js/TweenMax.min.js"></script>
+        <script src="js/draggabilly.pkgd.min.js"></script>
+        <script src="js/portfolio.js"></script-->
+        <script>
+            // Preload all the images in the page
+            //imagesLoaded(document.querySelectorAll('.img-inner'), {background: true}, () => document.body.classList.remove('loading'));
+        </script>        
+        <script>
+            $("#mail").on("click", function(){
+                if(typeof fbq == "function"){
+                    fbq('track', 'Contact');
+                }
+            });
+        </script>
+    </body>
+</html>
+
+the following is the code above 
+I want this to be knowledge graph website that is interactive network graph , that is interactive , when I click on a node it tells me its definition , you do not have to keep this project strictly python based , use whatever language that makes it look the most professional
+, modern , sleek and  I want every node to be like the dots , but visible and bigger , clicking which we get the definition of that , and other nodes open from it 

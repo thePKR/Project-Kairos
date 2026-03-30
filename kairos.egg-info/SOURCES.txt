@@ -3,10 +3,12 @@ pyproject.toml
 kairos.egg-info/PKG-INFO
 kairos.egg-info/SOURCES.txt
 kairos.egg-info/dependency_links.txt
+kairos.egg-info/entry_points.txt
 kairos.egg-info/requires.txt
 kairos.egg-info/top_level.txt
 src/__init__.py
 src/main.py
+src/memory_janitor.py
 src/state.py
 src/utils.py
 src/agents/__init__.py
@@ -14,3 +16,10 @@ src/agents/archivist.py
 src/agents/scout.py
 src/agents/think_tank.py
 src/agents/tool_maker.py
+src/memory/__init__.py
+src/memory/graph_manager.py
+src/rag/__init__.py
+src/rag/constraint_decoder.py
+src/rag/context_engine.py
+src/sandbox/__init__.py
+src/sandbox/executor.py

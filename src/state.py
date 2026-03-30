@@ -1,5 +1,5 @@
 from typing import Annotated, TypedDict, List, Dict, Any
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import BaseMessage  # type: ignore
 import operator
 
 class KairosState(TypedDict):
@@ -11,8 +11,16 @@ class KairosState(TypedDict):
     # 1. Activation Phase
     user_objective: str
     historical_context: str
+    deliverables_context: str
+    
+    # 1.5 RAG Context Phase (Prakhar Rai — Original Design)
+    rag_criteria: List[str]             # Criteria that must not be violated (from prior commands)
+    rag_session_id: str                 # Current session identifier
+    rag_command_number: int             # Command number within this session
+    rag_cross_session_context: str      # Relevant criteria pulled from other sessions
     
     # 2. Think-Tank Phase
+    tech_stack: str
     system_constraints: List[str]
     dependency_graph: Dict[str, Any]  # The JSON-based graph
     worker_assignments: Dict[str, str] # e.g. {"Login UI": "Agent Profile 3"}

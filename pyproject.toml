@@ -10,8 +10,8 @@ dependencies = [
     "python-dotenv",
 ]
 
-[tool.uv]
-python = "3.12"   # Use a prebuilt binary — avoids compiling Python from source
+[project.scripts]
+moment = "src.main:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

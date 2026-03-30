@@ -13,7 +13,9 @@ def get_llm(role: str = "general"):
     nvidia_fallback = ChatOpenAI(
         model="meta/llama-3.3-70b-instruct",
         api_key=nv_key,
-        base_url="https://integrate.api.nvidia.com/v1"
+        base_url="https://integrate.api.nvidia.com/v1",
+        timeout=600,
+        max_retries=3
     )
 
     if role == "ingestion_scout":
@@ -25,7 +27,9 @@ def get_llm(role: str = "general"):
             return ChatOpenAI(
                 model="deepseek-v3.2", 
                 api_key=ds_key,
-                base_url="https://api.deepseek.com/v1"
+                base_url="https://api.deepseek.com/v1",
+                timeout=600,
+                max_retries=3
             )
         return nvidia_fallback
         
@@ -35,7 +39,9 @@ def get_llm(role: str = "general"):
             return ChatOpenAI(
                 model="gpt-oss-120b",
                 api_key=oss_key,
-                base_url=os.getenv("GPT_OSS_BASE_URL", "http://localhost:8000/v1")
+                base_url=os.getenv("GPT_OSS_BASE_URL", "http://localhost:8000/v1"),
+                timeout=600,
+                max_retries=3
             )
         return nvidia_fallback
         
@@ -45,7 +51,9 @@ def get_llm(role: str = "general"):
             return ChatOpenAI(
                 model="kimi-k2.5",
                 api_key=kimi_key,
-                base_url="https://api.moonshot.cn/v1" 
+                base_url="https://api.moonshot.cn/v1",
+                timeout=600,
+                max_retries=3
             )
         return nvidia_fallback
         

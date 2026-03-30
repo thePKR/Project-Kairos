@@ -1,0 +1,2 @@
+[console_scripts]
+moment = src.main:main
