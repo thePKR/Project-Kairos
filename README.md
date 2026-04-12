@@ -1,7 +1,7 @@
 <p align="center">
-  <h1 align="center">Project Kairos</h1>
+  <h1 align="center">SKI – Project Kairos</h1>
   <p align="center">
-    <strong>Autonomous Software Factory</strong> — An objective-driven AI swarm that reasons, plans, builds, validates, and self-upgrades.
+    <strong>The Unstoppable Engine</strong> — A sovereign, objective-driven AI swarm that reasons, builds, and iterations $0 CAPEX Small Language Models (SLMs).
   </p>
   <p align="center">
     <a href="#-quickstart"><strong>Quickstart</strong></a> ·
@@ -16,7 +16,13 @@
 
 ## What is Kairos?
 
-Kairos is a multi-agent orchestration framework built on **LangGraph**. Give it an objective in plain English — it reasons through constraints, decomposes the work into modules, synthesizes code in parallel, validates it in a sandbox, and delivers a working file tree. If it writes new Python tools for itself, it can autonomously commit them to its own repository.
+**Project Kairos** is the continuous R&D and manufacturing engine operating under the **SKI** parent company. It is a multi-agent orchestration framework built on **LangGraph**. Give it an objective in plain English, and it autonomously manages the entire lifecycle of creating, testing, and deploying hyper-efficient Small Language Models (SLMs).
+
+### 🏰 The Efficiency Moat ("Unclaimable AI")
+Kairos is designed to be a "Business with No One Able to Claim It."
+- **$0 CAPEX:** We leverage existing free-tier/cloud topologies (Kaggle T4s/Colab) for training and DPO alignment.
+- **DePIN Architecture:** By compiling the inference engine in Rust (Candle) and quantizing models to 2-bits (BitNet 1.58b), our models run in <1GB RAM directly on Edge devices.
+- **Continuous Iteration:** Kairos is not a product; it's a factory. It constantly churns out v1, v2, v3, making the underlying technology impossible for centralized platforms to monopolize.
 
 The system is fully decoupled from local GPU hardware:
 
@@ -144,8 +150,8 @@ After launching with `moment`, you get an interactive prompt:
 
 ```
 ╔══════════════════════════════════════════════════════╗
-║         PROJECT KAIROS — Software Factory           ║
-║           Autonomous AI Build System                 ║
+║             SKI — PROJECT KAIROS                    ║
+║         Autonomous AI Manufacturing Engine           ║
 ╚══════════════════════════════════════════════════════╝
 
 kairos>
@@ -223,4 +229,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and pull request gu
 
 ## 📄 License
 
-This project is open source. See the repository for license details.
+**Project Kairos** is released under the **GNU Affero General Public License v3.0 (AGPL-3.0)**. 
+
+This ensures that the core manufacturing engine remains an open, unclaimable public common. Any commercial SaaS that attempts to wrap or host this network engine must release their modified source code back to the community.
+
+See the `LICENSE` file for details, and read `GOVERNANCE.md` to understand the division between the open-source Kairos engine and the tailored enterprise deployments handled by SKI.
